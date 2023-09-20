@@ -1,0 +1,3 @@
+certs/*
+.idea
+tests/.pytest_cache
