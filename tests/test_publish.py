@@ -1,3 +1,5 @@
+import time
+
 from mqqt import connect_mqtt, publish
 
 
@@ -6,8 +8,17 @@ def test_publisher():
 
     def on_message(client, userdata, msg):
         nonlocal received_data
-        print(f'Received `{msg.payload.decode()}` from `{msg.topic}` topic')
-        received_data += [(msg.topic, msg.payload.decode())]
+
+        payload = msg.payload.decode()
+        topic = msg.topic
+        try:
+            payload = float(payload)
+        except ValueError:
+            pass
+
+        print(f'Received `{payload}` from `{topic}` topic')
+
+        received_data += [(topic, payload)]
 
     data = [('/api/status', 'healthy'),
             ('/api/temperature/S50', 24.7),
@@ -23,5 +34,5 @@ def test_publisher():
     client.subscribe(topics)
 
     publish(client, data)
-
+    time.sleep(2)
     assert received_data == data
